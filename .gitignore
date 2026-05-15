@@ -1,0 +1,8 @@
+# Dpendencias
+node_modules/
+
+# Variables de entorno
+.env
+
+# txt
+envbd.txt
