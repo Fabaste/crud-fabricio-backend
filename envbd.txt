@@ -1,4 +1,0 @@
-crudbd
-FullStack_1978
-
-mongodb+srv://crudbd:FullStack_1978@fullstackinicio.yfzy5zy.mongodb.net/
