@@ -6,3 +6,18 @@ node_modules/
 
 # txt
 envbd.txt
+
+# Logs
+logs/
+*.log
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# Build
+dist/
+build/
