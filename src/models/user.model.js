@@ -40,6 +40,26 @@ const userSchema = new mongoose.Schema({
     direccion:{
         type: String,
         required: true
+    },
+    
+    cp:{
+        type: String,
+        required: true
+    },
+    
+    localidad:{
+        type: String,
+        required: true
+    },
+    
+    provincia:{
+        type: String,
+        required: true
+    },
+    
+    pais:{
+        type: String,
+        required: true
     }
 }, {
     timestamps:true

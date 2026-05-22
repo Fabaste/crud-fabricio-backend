@@ -8,7 +8,11 @@ const createUserSchema = Joi.object({
     edad: Joi.number().required(),
     sexo: Joi.string().required(),
     telefono: Joi.string().required(),
-    direccion: Joi.string().required()
+    direccion: Joi.string().required(),
+    cp: Joi.string().required(),
+    localidad: Joi.string().required(),
+    provincia: Joi.string().required(),
+    pais: Joi.string().required()
 })
 
 const updateUserSchema = Joi.object({
@@ -18,7 +22,11 @@ const updateUserSchema = Joi.object({
     edad: Joi.number(),
     sexo: Joi.string(),
     telefono: Joi.string(),
-    direccion: Joi.string()
+    direccion: Joi.string(),
+    cp: Joi.string(),
+    localidad: Joi.string(),
+    provincia: Joi.string(),
+    pais: Joi.string(),
 })
 
 export {
