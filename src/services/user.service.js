@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs"
 import User from '../models/user.model.js'
 import Audit from '../models/audit.model.js'
+import mongoose from "mongoose"
 
 const getUsersService = async () => {
     try {
@@ -73,16 +74,21 @@ const updateUserService = async (id,data) => {
         console.log(id)
         console.log(data)
 
+        if (!mongoose.Types.ObjectId.isValid(id)){
+            throw new Error('Usuario no encontrado')
+        }
+
         const user = await User.findById(id)
 
         if (!user){
             throw new Error('Usuario no encontrado')
         }
 
+        console.log(user)
         //No permitir cambiar email
-        if (data.email) {
+        /*if (data.email) {
             throw new Error('El email no puede modificarse')
-        }
+        }*/
 
         // Update parcial
         if (data.nombre) user.nombre = data.nombre
@@ -104,8 +110,10 @@ const updateUserService = async (id,data) => {
             )
         }
 
+        console.log("llegue")
         await user.save()
     
+        console.log(user)
         return {
             id: user._id,
             nombre: user.nombre,

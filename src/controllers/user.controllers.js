@@ -1,6 +1,7 @@
 import {
     createUserSchema,
-    updateUserSchema
+    updateUserSchema,
+    userParamsSchema
 } from '../dto/user.dto.js'
 
 import {
@@ -48,6 +49,15 @@ const updateUser = async (req,res) => {
     try {
         console.log('CONTROLLER -> updateUser')
         // VALIDAR DTO
+        const {error: paramsError} = userParamsSchema.validate(req.params)
+        console.log(" ~ updateUser ~ error:", paramsError)
+
+        if (paramsError){
+            return res.status(400).json({
+                message: 'Id invalido'
+            })
+        }
+
         const {error} = updateUserSchema.validate(req.body)
 
         if (error){
@@ -71,6 +81,16 @@ const updateUser = async (req,res) => {
 const deleteUser = async (req,res) => {
     try {
         console.log('CONTROLLER -> deleteUser')
+
+        const {error: paramsError} = userParamsSchema.validate(req.params)
+        console.log(" ~ updateUser ~ error:", paramsError)
+
+        if (paramsError){
+            return res.status(400).json({
+                message: 'Id invalido'
+            })
+        }
+        
         const result = await deleteUserService(
             req.params.id
         )

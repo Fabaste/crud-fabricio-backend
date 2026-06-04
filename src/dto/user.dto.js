@@ -29,7 +29,12 @@ const updateUserSchema = Joi.object({
     pais: Joi.string(),
 })
 
+const userParamsSchema = Joi.object({
+    id: Joi.string().hex().length(24).required()
+})
+
 export {
     createUserSchema,
-    updateUserSchema
+    updateUserSchema,
+    userParamsSchema
 }
