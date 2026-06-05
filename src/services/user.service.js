@@ -3,11 +3,38 @@ import User from '../models/user.model.js'
 import Audit from '../models/audit.model.js'
 import mongoose from "mongoose"
 
-const getUsersService = async () => {
+const getUsersService = async ({email,id}) => {
+    console.log('SERVICE -> getUsersService')
     try {
-        console.log('SERVICE -> getUsersService')
-        const users = await User.find().select('-password')
-        return users
+        if(id) {
+            if(!mongoose.Types.ObjectId.isValid(id)){
+                throw{
+                    statusCode: 400,
+                    message: "Id inválido",
+                }
+            }
+
+            const user = await User.findById(id).select('-password')
+            if (!user){
+                throw{
+                    statusCode: 404,
+                    message: "Usuario no encontrado",
+                }
+            }
+            return user
+        }
+
+        if (email) {
+            const user = await User.findOne({email}).select('-password')
+            if (!user){
+                throw{
+                    statusCode: 404,
+                    message: "Usuario no encontrado",
+                }
+            }
+            return user
+        }
+
     } catch (error) {
         throw error
     }

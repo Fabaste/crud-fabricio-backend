@@ -1,32 +1,45 @@
 import Joi from 'joi'
 
 const createUserSchema = Joi.object({
-    nombre: Joi.string().required(),
-    apellido: Joi.string().required(),
-    email: Joi.string().email().required(),
-    password: Joi.string().min(6).required(),
-    edad: Joi.number().required(),
-    sexo: Joi.string().required(),
-    telefono: Joi.string().required(),
-    direccion: Joi.string().required(),
-    cp: Joi.string().required(),
-    localidad: Joi.string().required(),
-    provincia: Joi.string().required(),
-    pais: Joi.string().required()
+    nombre: Joi.string().trim().min(2).max(50).required(),
+    apellido: Joi.string().trim().min(2).max(50).required(),
+    email: Joi.string().trim().email().required(),
+    password: Joi.string().min(6).max(50).required(),
+    fechaNacimiento: Joi.date().required(),
+    edad: Joi.number().integer().min(1).max(120).required().messages({
+        "number.base": "La edad debe ser numérica",
+        "number.integer": "La edad debe ser un número entero",
+        "number.min": "La edad debe ser mayor a 0",
+        "number.max": "La edad no puede ser mayor a 120",
+    }),
+    sexo: Joi.string().trim().required(),
+    telefono: Joi.string().trim().min(6).max(20).required(),
+    direccion: Joi.string().trim().max(200).required(),
+    cp: Joi.string().trim().max(20).required(),
+    localidad: Joi.string().trim().max(100).required(),
+    provincia: Joi.string().trim().max(100).required(),
+    pais: Joi.string().trim().max(100).required()
 })
 
 const updateUserSchema = Joi.object({
-    nombre: Joi.string(),
-    apellido: Joi.string(),
-    password: Joi.string().min(6),
-    edad: Joi.number(),
-    sexo: Joi.string(),
-    telefono: Joi.string(),
-    direccion: Joi.string(),
-    cp: Joi.string(),
-    localidad: Joi.string(),
-    provincia: Joi.string(),
-    pais: Joi.string(),
+    nombre: Joi.string().trim().min(2).max(50),
+    apellido: Joi.string().trim().min(2).max(50),
+    email: Joi.string().trim().email(),
+    password: Joi.string().min(6).max(50),
+    fechaNacimiento: Joi.date(),
+    edad: Joi.number().integer().min(1).max(120).messages({
+        "number.base": "La edad debe ser numérica",
+        "number.integer": "La edad debe ser un número entero",
+        "number.min": "La edad debe ser mayor a 0",
+        "number.max": "La edad no puede ser mayor a 120",
+    }),
+    sexo: Joi.string().trim(),
+    telefono: Joi.string().trim().min(6).max(20),
+    direccion: Joi.string().trim().max(200),
+    cp: Joi.string().trim().max(20),
+    localidad: Joi.string().trim().max(100),
+    provincia: Joi.string().trim().max(100),
+    pais: Joi.string().trim().max(100),
 })
 
 const userParamsSchema = Joi.object({
