@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs"
 import User from '../models/user.model.js'
 import Audit from '../models/audit.model.js'
-import mongoose from "mongoose"
+import mongoose, { mongo } from "mongoose"
 
 const getUsersService = async ({email,id}) => {
     console.log('SERVICE -> getUsersService')
@@ -34,27 +34,39 @@ const getUsersService = async ({email,id}) => {
             }
             return user
         }
+        return await User.find().select("-password").sort({nombre:1})
 
     } catch (error) {
-        throw error
+        console.error(
+            "Error en getUsersService:",error
+        )
+        throw {
+            statuscode: error.statusCode || 500,
+            message: error.statusCode || "Error interno del servidor",
+            errors: error.errors || null,
+        }
     }
 }
 
 const createUserService = async (data) => {
+    console.log('SERVICE -> createUserService')
+    console.log(data)
+
     try {
-        console.log('SERVICE -> createUserService')
-        console.log(data)
         const existUser = await User.findOne({
-            email: data.email   
+            email: data.email,  
         })
 
         if (existUser){
-            throw new Error('El usuario ya existe')
+            throw {
+                statuscode: 409,
+                message: 'El usuario ya existe',
+            }
         }
 
         const hashedPassword = await bcrypt.hash(
             data.password, 
-            10
+            10,
         )
 
         const user = new User({
@@ -62,6 +74,7 @@ const createUserService = async (data) => {
             apellido: data.apellido,
             email: data.email,
             password: hashedPassword,
+            fechaNacimiento: data.fechaNacimiento,
             edad: data.edad,
             sexo: data.sexo,
             telefono: data.telefono,
@@ -80,6 +93,7 @@ const createUserService = async (data) => {
             nombre: user.nombre,
             apellido: user.apellido,
             email: user.email,
+            fechaNacimiento: user.fechaNacimiento,
             edad: user.edad,
             sexo: user.sexo,
             telefono: user.telefono,
@@ -91,33 +105,58 @@ const createUserService = async (data) => {
 
         }
     } catch (error) {
-        throw error
+        //throw error
+        console.error (
+            "Error en createUserService:",
+            error
+        )
+
+        throw {
+            statusCode: error.statusCode || 500,
+            message: error.message || "Error interno del servidor",
+            errors: error.errors || null,
+        }
     }
 }
 
 const updateUserService = async (id,data) => {
-    try {
         console.log('SERVICE -> updateUserService')
         console.log(id)
         console.log(data)
 
+    try {
+
         if (!mongoose.Types.ObjectId.isValid(id)){
-            throw new Error('Usuario no encontrado')
+            //throw new Error('Usuario no encontrado')
+            throw{
+                statusCode: 400,
+                message: "Id inválido",
+            }
         }
 
         const user = await User.findById(id)
 
         if (!user){
-            throw new Error('Usuario no encontrado')
+            //throw new Error('Usuario no encontrado')
+            throw {
+                statusCode: 404,
+                message: "Usuario no encontrado",                
+            }
         }
 
-        console.log(user)
+        //console.log(user)
         //No permitir cambiar email
         /*if (data.email) {
             throw new Error('El email no puede modificarse')
         }*/
+       if (data.email !== undefined) {
+            throw {
+                statusCode: 400,
+                message: "El email no puede modificarse",
+            }
+       }
 
-        // Update parcial
+       /* // Update parcial
         if (data.nombre) user.nombre = data.nombre
         if (data.apellido) user.apellido = data.apellido
         if (data.edad) user.edad = data.edad
@@ -128,12 +167,31 @@ const updateUserService = async (id,data) => {
         if (data.localidad) user.localidad = data.localidad
         if (data.provincia) user.provincia = data.provincia
         if (data.pais) user.pais = data.pais
+       */
+      const allowedFields = [
+        "nombre",
+        "apellido",
+        "fechaNacimiento",
+        "edad",
+        "sexo",
+        "telefono",
+        "direccion",
+        "cp",
+        "localidad",
+        "provincia",
+        "pais",
+      ]
 
+      allowedFields.forEach((field) => {
+        if (data[field] !== undefined){
+            user[field] = data[field]
+        }
+      })
         // Cambiar password si viene
-        if (data.password) {
+        if (data.password !== undefined) {
             user.password = await bcrypt.hash(
-            data.password,
-            10
+                data.password,
+                10
             )
         }
 
@@ -153,37 +211,88 @@ const updateUserService = async (id,data) => {
             cp: user.cp,
             localidad: user.localidad,
             provincia: user.provincia,
-            pais: user.pais
+            pais: user.pais,
         }
 
     } catch (error) {
-        throw error
+        //throw error
+        console.error (
+            "Error en updateUserService:", error
+        )
+
+        throw {
+            statusCode: error.statusCode || 500,
+            message: error.message || "Error interno del servidor",
+            errors: error.errors || null,
+        }
     }
 }
 
 const deleteUserService = async (id) => {
-    try {
         console.log('SERVICE -> deleteUserService')
         console.log(id)
 
-        const user = await User.findById(id)
+    let session
 
-        if(!user) {
-            throw new Error('Usuario no encontrado')
+    try {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw {
+                statusCode: 400,
+                message: "Id inválido",
+            }
         }
 
-        //Auditoria
-        await Audit.create ({
-            usuarioEliminado: user
+        session = await mongoose.startSession()
+
+        await session.withTransaction (async () => {
+
+            const user = await User.findById(id).session(session)
+
+            if(!user) {
+                //throw new Error('Usuario no encontrado')
+                throw {
+                    statusCode: 404,
+                    message: "Usuario no encontrado",
+                }
+            }
+
+            //Auditoria
+            await Audit.create (
+                [
+                    {
+                        usuarioEliminado: user.toObject(),
+                        fechaEliminacion: new Date(),
+                    },
+                ],
+                {session}
+            )
+
+            //await User.findByIdAndDelete(id)
+            await user.deleteOne({ session})
         })
 
-        await User.findByIdAndDelete(id)
-
         return {
-            message: 'Usuario eliminado'
+            message: 'Usuario eliminado',
         }
+
+
+
     } catch (error) {
-        throw error
+        //throw error
+        console.error(
+            "Error en deleteUserService:", error
+        )
+        
+        throw {
+            statusCode: error.statusCode || 500,
+            message: error.message || "Error interno del servidor",
+            errors: error.errors || null,
+        }
+    }
+    finally {
+        if(session) {
+            await session.endSession()
+        }
     }
 }
 

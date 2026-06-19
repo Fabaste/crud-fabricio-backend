@@ -40,10 +40,16 @@ const updateUserSchema = Joi.object({
     localidad: Joi.string().trim().max(100),
     provincia: Joi.string().trim().max(100),
     pais: Joi.string().trim().max(100),
+}).min(1).messages({
+    "object.min": "Debe enviar al menos un campo para actualizar",
 })
 
 const userParamsSchema = Joi.object({
-    id: Joi.string().hex().length(24).required()
+    id: Joi.string().hex().length(24).required().messages({
+        "string.hex": "El id debe ser un ObjectId válido",
+        "string.length": "El id debe tener 24 caracteres",
+        "any.required": "El id es obligatorio",
+    }),
 })
 
 export {

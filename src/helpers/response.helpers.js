@@ -1,9 +1,9 @@
-export const successResponse = {
+export const successResponse = (
     res,
     data = null,
     message = "Operación exitosa",
     statusCode = 200
-} => {
+) => {
     return res.status(statusCode).json({
         success: true,
         statusCode,
