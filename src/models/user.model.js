@@ -65,7 +65,18 @@ const userSchema = new mongoose.Schema({
     pais:{
         type: String,
         required: true
-    }
+    },
+    
+    role: {
+        type: String,
+        enum: ["ROOT", "ADMIN", "USER", "GUEST"],
+        default: "USER",
+    },
+
+    ultimoLogin: {
+        type: Date,
+        default: null,
+    },
 }, {
     timestamps:true
 })

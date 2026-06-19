@@ -1,5 +1,12 @@
 import Joi from 'joi'
 
+const roles = [
+    "ROOT",
+    "ADMIN",
+    "USER",
+    "GUEST",
+]
+
 const createUserSchema = Joi.object({
     nombre: Joi.string().trim().min(2).max(50).required(),
     apellido: Joi.string().trim().min(2).max(50).required(),
