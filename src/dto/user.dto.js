@@ -25,7 +25,11 @@ const createUserSchema = Joi.object({
     cp: Joi.string().trim().max(20).required(),
     localidad: Joi.string().trim().max(100).required(),
     provincia: Joi.string().trim().max(100).required(),
-    pais: Joi.string().trim().max(100).required()
+    pais: Joi.string().trim().max(100).required(),
+    role: Joi.string().valid(...roles).default("USER").messages({
+        "any.only": `El rol debe ser uno de los siguientes: ${roles.join(", ")}`,
+    }),
+    /* userName: Joi.string().trim().min(2).max(100).required(),  */
 })
 
 const updateUserSchema = Joi.object({
@@ -47,6 +51,10 @@ const updateUserSchema = Joi.object({
     localidad: Joi.string().trim().max(100),
     provincia: Joi.string().trim().max(100),
     pais: Joi.string().trim().max(100),
+    role: Joi.string().valid(...roles).messages({
+        "any.only": `El rol debe ser uno de los siguientes: ${roles.join(", ")}`,
+    })
+    /* userName: Joi.string().trim().min(2).max(100),  */
 }).min(1).messages({
     "object.min": "Debe enviar al menos un campo para actualizar",
 })
