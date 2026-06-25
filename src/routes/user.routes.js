@@ -29,11 +29,13 @@ router.post('/users',
     'ROOT',
     'ADMIN',
 ), createUser)
+
 router.put('/users/:id', 
     authMiddleware, authorizeRoles(
     'ROOT',
     'ADMIN',
 ),updateUser)
+
 router.delete('/users/:id', 
     authMiddleware, authorizeRoles(
     'ROOT',
