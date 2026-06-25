@@ -1,4 +1,4 @@
-import { errorResponse } from "../helpers/response.helper";
+import { errorResponse } from "../helpers/response.helpers.js";
 
 const authorizeRoles = (...roles) => (req, res, next) => {
     try {

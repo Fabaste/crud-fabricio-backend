@@ -8,7 +8,7 @@ export const successResponse = (
         success: true,
         statusCode,
         message,
-        data,
+        data
     });
 };
 
@@ -22,6 +22,6 @@ export const errorResponse = (
         success: false,
         statusCode,
         message,
-        errors,
+        errors
     });
 };

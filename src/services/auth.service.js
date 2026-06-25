@@ -32,7 +32,7 @@ const loginService = async (data) => {
 
         //Payload del token
         const payload = {
-            userId: user_id,
+            userId: user._id,
             role: user.role,
         }
 

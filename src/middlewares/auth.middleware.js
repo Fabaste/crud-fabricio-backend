@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
-import { errorResponse } from "../helpers/response.helper.js";
+import { errorResponse } from "../helpers/response.helpers.js";
+import{ env } from '../config/env.js'
 
 const authMiddleware = (req, res, next,) => {
     try {
@@ -12,7 +13,8 @@ const authMiddleware = (req, res, next,) => {
 
         const token = authorization.replace("Bearer ", "",);
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET,);
+        //const decoded = jwt.verify(token, process.env.JWT_SECRET,);
+        const decoded = jwt.verify(token, env.JWT_SECRET,);
 
         req.user = { userId: decoded.userId, role: decoded.role,};
         

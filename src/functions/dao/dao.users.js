@@ -1,4 +1,4 @@
-const calculateAge = async (users) => {
+const calcularEdad = async (users) => {
     const today = new Date();
 
     for (const user of users) {
@@ -19,4 +19,4 @@ const calculateAge = async (users) => {
     return users;
 }
 
-export default calculateAge
+export default calcularEdad
