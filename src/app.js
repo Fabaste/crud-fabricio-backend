@@ -1,13 +1,14 @@
 import express from 'express'
 import './config/env.js'
 import connectDB from './config/db.js'
-
-import { env } from './config/env.js'
+import corsConfig from "./config/cors.js"
+//import { env } from './config/env.js'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 
 const app = express()
 
+app.use(corsConfig)
 app.use(express.json())
 connectDB()
 
