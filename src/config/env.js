@@ -9,8 +9,8 @@ requiredVariables.forEach((variable) => {
 })
 
 console.log('Variables de entorno cargadas')
-console.log(process.env.MONGO_URI)
-console.log(process.env.PORT)
+//console.log(process.env.MONGO_URI)
+//console.log(process.env.PORT)
 
 export const env = {
     PORT: process.env.PORT,

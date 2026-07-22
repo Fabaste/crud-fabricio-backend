@@ -8,7 +8,20 @@ export const successResponse = (
         success: true,
         statusCode,
         message,
-        data
+        data,
+    });
+};
+
+export const forbiddenResponse = (
+    res,
+    message = "Acceso denegado",
+    errors = null
+) => {
+    return res.status(403).json({
+        success: false,
+        statusCode: 403,
+        message,
+        errors,
     });
 };
 
@@ -22,6 +35,6 @@ export const errorResponse = (
         success: false,
         statusCode,
         message,
-        errors
+        errors,
     });
 };

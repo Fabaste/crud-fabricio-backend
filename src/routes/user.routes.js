@@ -22,12 +22,13 @@ router.get('/users',
     authMiddleware, authorizeRoles(
     'ROOT',
     'ADMIN',
+    "USER"
 ), getUsers)
 
 router.post('/users', 
     authMiddleware, authorizeRoles(
     'ROOT',
-    'ADMIN',
+    'ADMIN'
 ), createUser)
 
 router.put('/users/:id', 

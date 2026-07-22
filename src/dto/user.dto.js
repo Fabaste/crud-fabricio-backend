@@ -26,7 +26,9 @@ const createUserSchema = Joi.object({
     localidad: Joi.string().trim().max(100).required(),
     provincia: Joi.string().trim().max(100).required(),
     pais: Joi.string().trim().max(100).required(),
-    role: Joi.string().valid(...roles).default("USER").messages({
+    role: Joi.string().valid(...roles)
+    //.default("USER")
+    .messages({
         "any.only": `El rol debe ser uno de los siguientes: ${roles.join(", ")}`,
     }),
     /* userName: Joi.string().trim().min(2).max(100).required(),  */

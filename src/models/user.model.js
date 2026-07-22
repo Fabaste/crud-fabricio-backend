@@ -70,7 +70,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: ["ROOT", "ADMIN", "USER", "GUEST"],
-        default: "USER",
+        //default: "USER",
     },
 
     ultimoLogin: {

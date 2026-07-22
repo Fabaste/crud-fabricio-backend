@@ -14,17 +14,20 @@ import {
 import {
     successResponse,
     errorResponse,
+    forbiddenResponse
 } from "../helpers/response.helpers.js"
 
 const getUsers = async (req,res) => {
     try{
-        console.log('CONTROLLER -> getUsers')
+        //console.log('CONTROLLER -> getUsers')
 
         const { email,id} = req.query
 
         const users = await getUsersService({
             email,
             id,
+            requesterRole: req.user?.role,
+            requesterid: req.user?.userId,
         })
         //res.json(users)
         return successResponse(
@@ -34,6 +37,9 @@ const getUsers = async (req,res) => {
         )
     } catch (error) {
         //res.status(500).json({
+        if (error.statusCode ===403){
+            return forbiddenResponse(res, error.message || "Acceso denegado", error.errors || null)
+        }
         return errorResponse(
             res,
             error.message || "Error interno del servidor",
@@ -45,23 +51,26 @@ const getUsers = async (req,res) => {
 
 const createUser = async (req,res) => {
     try {
-        console.log('CONTROLLER -> createUser')
+        //console.log('CONTROLLER -> createUser')
 
         // VALIDAR DTO
         const {error} = createUserSchema.validate(req.body)
 
         if (error){
-            return res.status(400).json({
+            /*return res.status(400).json({
                 error: error.details[0].message
-            })        
+            })   */     
+           return successResponse(res, "Error de validación", 400, error.details)
         }
 
         const user = await createUserService(req.body)
-        res.status(201).json(user)
+        //res.status(201).json(user)
+        return successResponse(res, user, "Usuario creado correctamente", 201)
     } catch (error) {
-        res.status(500).json({
+        /*res.status(500).json({
             error: error.message
-        })
+        })*/
+       return errorResponse(res, error.message || "Error interno del servidor", error.statusCode || 500, error.errors || null)
     }    
 }
 
@@ -70,46 +79,51 @@ const updateUser = async (req,res) => {
         console.log('CONTROLLER -> updateUser')
         // VALIDAR DTO
         const {error: paramsError} = userParamsSchema.validate(req.params)
-        console.log(" ~ updateUser ~ error:", paramsError)
+        //console.log(" ~ updateUser ~ error:", paramsError)
 
         if (paramsError){
-            return res.status(400).json({
+            /*return res.status(400).json({
                 //message: 'Id invalido',
                 error: paramsError.details[0].message
-            })
+            })*/
+           return errorResponse(res, "Id inválido", 400, paramsError.details)
         }
 
         const {error} = updateUserSchema.validate(req.body)
 
         if (error){
-            return res.status(400).json({
+            /*return res.status(400).json({
                 error: error.details[0].message
-            })        
+            })*/
+           return errorResponse(res, "Error de validación", 400, error.details)        
         }
 
         const user = await updateUserService(
             req.params.id,
             req.body
         )
-        res.json(user)
+        //res.json(user)
+        return successResponse(res, user, "Usuario actualizado correctamente")
     } catch (error) {
-        res.status(500).json({
+        /*res.status(500).json({
             error: error.message
-        })
+        })*/
+       return errorResponse(res, error.message || "Error interno del servidor", error.statusCode || 500, error.errors || null)
     }
 }
 
 const deleteUser = async (req,res) => {
     try {
-        console.log('CONTROLLER -> deleteUser')
+        //console.log('CONTROLLER -> deleteUser')
 
         const {error: paramsError} = userParamsSchema.validate(req.params)
-        console.log(" ~ updateUser ~ error:", paramsError)
+        //console.log(" ~ updateUser ~ error:", paramsError)
 
         if (paramsError){
-            return res.status(400).json({
+            /*return res.status(400).json({
                 message: 'Id invalido'
-            })
+            })*/
+           return errorResponse(res, "Id inválido",400, paramsError.details)
         }
         
         const result = await deleteUserService(
@@ -119,13 +133,14 @@ const deleteUser = async (req,res) => {
         return successResponse(
             res,
             result,
-            "Usuario no encontrado"
+            "Usuario eliminado correctamente"
         )
         
     } catch (error) {
-        res.status(500).json({
+        /*res.status(500).json({
             error: error.message
-        })
+        })*/
+       return errorResponse(res, error.message || "Error interno del servidor", error.statusCode || 500, error.errors || null)
     }
 }
 

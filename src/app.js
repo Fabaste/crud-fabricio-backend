@@ -5,11 +5,14 @@ import corsConfig from "./config/cors.js"
 //import { env } from './config/env.js'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
+import { rateLimiter } from './middlewares/rateLimit.middlewares.js'
 
 const app = express()
 
+app.set("trust proxy", 1)
 app.use(corsConfig)
 app.use(express.json())
+app.use(rateLimiter)
 connectDB()
 
 app.use(userRoutes)
