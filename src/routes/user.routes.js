@@ -18,17 +18,12 @@ router.put('/users/:id', updateUser)
 router.delete('/users/:id', deleteUser)
 */
 
-router.get('/users', 
-    authMiddleware, authorizeRoles(
-    'ROOT',
-    'ADMIN',
-    "USER"
-), getUsers)
+router.get('/users', authMiddleware, authorizeRoles('ROOT','ADMIN',"USER"), getUsers)
 
 router.post('/users', 
     authMiddleware, authorizeRoles(
     'ROOT',
-    'ADMIN'
+    'ADMIN',
 ), createUser)
 
 router.put('/users/:id', 

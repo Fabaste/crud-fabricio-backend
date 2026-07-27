@@ -10,6 +10,8 @@ const getUsersService = async ({email,id, requesterRole, requesterId}) => {
         const role = requesterRole?.toUpperCase()
         const currentUserId = requesterId?.toString()
 
+            console.log(role)
+            console.log(currentUserId)
         if (!role) {
             throw {
                 statusCode: 403,
@@ -85,7 +87,6 @@ const getUsersService = async ({email,id, requesterRole, requesterId}) => {
 
         if (role === "USER") {
             const user = await User.findById(currentUserId).select('-password')
-            console.log(user)
             if (!user) {
                 throw {
                     statusCode: 404,
@@ -112,11 +113,13 @@ const getUsersService = async ({email,id, requesterRole, requesterId}) => {
     }
 }
 
-const createUserService = async (data) => {
+const createUserService = async (data, { requesterRole }) => {
     console.log('SERVICE -> createUserService')
     console.log(data)
 
     try {
+        const role = requesterRole?.toUpperCase()
+
         const existUser = await User.findOne({
             email: data.email,  
         })
@@ -126,6 +129,14 @@ const createUserService = async (data) => {
                 statuscode: 409,
                 message: 'El usuario ya existe',
             }
+        }
+
+
+        if (role === "ADMIN" && (data.role === "ROOT" || data.role === "ADMIN")) {
+            throw {
+                    statusCode: 403,
+                    message: `No tiene permisos para agregar usuarios ${data.role}`,
+                }
         }
 
         const hashedPassword = await bcrypt.hash(
@@ -146,7 +157,8 @@ const createUserService = async (data) => {
             cp: data.cp,
             localidad: data.localidad,
             provincia: data.provincia,
-            pais: data.pais
+            pais: data.pais,
+            role: data.role
 
         })
 
@@ -165,9 +177,10 @@ const createUserService = async (data) => {
             cp: user.cp,
             localidad: user.localidad,
             provincia: user.provincia,
-            pais: user.pais
-
+            pais: user.pais,
+            role: user.role
         }
+
     } catch (error) {
         //throw error
         console.error (
@@ -183,12 +196,15 @@ const createUserService = async (data) => {
     }
 }
 
-const updateUserService = async (id,data) => {
+const updateUserService = async (id,data,{requesterRole, requesterId}) => {
         console.log('SERVICE -> updateUserService')
         console.log(id)
         console.log(data)
 
     try {
+        
+        const role = requesterRole?.toUpperCase()
+        const currentUserId = requesterId?.toString()
 
         if (!mongoose.Types.ObjectId.isValid(id)){
             //throw new Error('Usuario no encontrado')
@@ -220,6 +236,19 @@ const updateUserService = async (id,data) => {
             }
        }
 
+       if (role === "ADMIN" && data.role === "ROOT") {
+            throw {
+                statuscode: 403,
+                message: "No tiene permisos para modificar usuarios root"
+            }
+       }
+       if (role === "ADMIN" && data.role === "ADMIN" && currentUserId !== id) {
+            throw {
+                    statusCode: 403,
+                    message: "No tiene permisos para modificar otros usuarios admin",
+                }
+       }
+
        /* // Update parcial
         if (data.nombre) user.nombre = data.nombre
         if (data.apellido) user.apellido = data.apellido
@@ -244,6 +273,7 @@ const updateUserService = async (id,data) => {
         "localidad",
         "provincia",
         "pais",
+        "role",
       ]
 
       allowedFields.forEach((field) => {
@@ -259,7 +289,7 @@ const updateUserService = async (id,data) => {
             )
         }
 
-        console.log("llegue")
+        //console.log("llegue")
         await user.save()
     
         console.log(user)
@@ -276,6 +306,7 @@ const updateUserService = async (id,data) => {
             localidad: user.localidad,
             provincia: user.provincia,
             pais: user.pais,
+            role: user.role,
         }
 
     } catch (error) {
@@ -332,7 +363,7 @@ const deleteUserService = async (id) => {
             )
 
             //await User.findByIdAndDelete(id)
-            await user.deleteOne({ session})
+            await user.deleteOne({ session })
         })
 
         return {

@@ -3,11 +3,11 @@ import {errorResponse} from "../helpers/response.helpers.js"
 import SecurityLog from "../models/securityLog.model.js"
 
 const windowMinutes = Number(process.env.RATE_LIMIT_WINDOW_MINUTES || 15)
-const masRequests = Number(process.env.RATE_LIMIT_MAX_REQUESTS || 100)
+const maxRequests = Number(process.env.RATE_LIMIT_MAX_REQUESTS || 100)
 
 const rateLimiter = rateLimit({
-    windowMS: windowMinutes * 60 * 1000,
-    max: masRequests,
+    windowMs: windowMinutes * 60 * 1000,
+    max: maxRequests,
     standardHeaders: true,
     legacyHeaders: false,
     message: {

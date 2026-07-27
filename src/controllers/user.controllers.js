@@ -21,13 +21,13 @@ const getUsers = async (req,res) => {
     try{
         //console.log('CONTROLLER -> getUsers')
 
-        const { email,id} = req.query
+        const { email,id } = req.query
 
         const users = await getUsersService({
             email,
             id,
             requesterRole: req.user?.role,
-            requesterid: req.user?.userId,
+            requesterId: req.user?.userId,
         })
         //res.json(users)
         return successResponse(
@@ -63,7 +63,14 @@ const createUser = async (req,res) => {
            return successResponse(res, "Error de validación", 400, error.details)
         }
 
-        const user = await createUserService(req.body)
+        //const user = await createUserService(req.body)
+        
+        //const role = req.body.role
+
+        const user = await createUserService(req.body,{
+            requesterRole: req.user?.role,
+        })
+
         //res.status(201).json(user)
         return successResponse(res, user, "Usuario creado correctamente", 201)
     } catch (error) {
@@ -100,8 +107,11 @@ const updateUser = async (req,res) => {
 
         const user = await updateUserService(
             req.params.id,
-            req.body
-        )
+            req.body,
+            {requesterRole: req.user?.role,
+             requesterId: req.user?.id
+        })
+
         //res.json(user)
         return successResponse(res, user, "Usuario actualizado correctamente")
     } catch (error) {
