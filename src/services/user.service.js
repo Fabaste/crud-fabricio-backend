@@ -10,8 +10,6 @@ const getUsersService = async ({email,id, requesterRole, requesterId}) => {
         const role = requesterRole?.toUpperCase()
         const currentUserId = requesterId?.toString()
 
-            console.log(role)
-            console.log(currentUserId)
         if (!role) {
             throw {
                 statusCode: 403,
@@ -151,7 +149,7 @@ const createUserService = async (data, { requesterRole }) => {
             password: hashedPassword,
             fechaNacimiento: data.fechaNacimiento,
             edad: data.edad,
-            sexo: data.sexo,
+            genero: data.genero,
             telefono: data.telefono,
             direccion: data.direccion,
             cp: data.cp,
@@ -171,7 +169,7 @@ const createUserService = async (data, { requesterRole }) => {
             email: user.email,
             fechaNacimiento: user.fechaNacimiento,
             edad: user.edad,
-            sexo: user.sexo,
+            genero: user.genero,
             telefono: user.telefono,
             direccion: user.direccion,
             cp: user.cp,
@@ -266,7 +264,7 @@ const updateUserService = async (id,data,{requesterRole, requesterId}) => {
         "apellido",
         "fechaNacimiento",
         "edad",
-        "sexo",
+        "genero",
         "telefono",
         "direccion",
         "cp",
@@ -299,7 +297,7 @@ const updateUserService = async (id,data,{requesterRole, requesterId}) => {
             apellido: user.apellido,
             email: user.email,
             edad: user.edad,
-            sexo: user.sexo,
+            genero: user.genero,
             telefono: user.telefono,
             direccion: user.direccion,
             cp: user.cp,

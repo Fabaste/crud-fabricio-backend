@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
         required: true
     },
 
-    sexo:{
+    genero:{
         type: String,
         required: true
     },

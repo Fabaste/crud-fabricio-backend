@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken"
 
 import { errorResponse } from "../helpers/response.helpers.js";
 import{ env } from '../config/env.js'
