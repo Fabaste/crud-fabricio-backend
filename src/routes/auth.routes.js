@@ -5,6 +5,6 @@ import { bruteForceMiddleware } from "../middlewares/bruteForce.middlewares.js"
 const router = express.Router()
 
 //router.post("/login",login)
-router.post("/login", bruteForceMiddleware, login)
+router.post("/login", /*bruteForceMiddleware,*/ login)
 
 export default router

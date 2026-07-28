@@ -87,6 +87,7 @@ const getUsersService = async ({email,id, requesterRole, requesterId}) => {
 
         if (role === "USER") {
             const user = await User.findById(currentUserId).select('-password')
+            console.log(user)
             if (!user) {
                 throw {
                     statusCode: 404,
