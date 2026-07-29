@@ -152,7 +152,7 @@ const createUserService = async (data, { requesterRole }) => {
             genero: data.genero,
             telefono: data.telefono,
             direccion: data.direccion,
-            cp: data.cp,
+            codigoPostal: data.codigoPostal,
             localidad: data.localidad,
             provincia: data.provincia,
             pais: data.pais,
@@ -172,7 +172,7 @@ const createUserService = async (data, { requesterRole }) => {
             genero: user.genero,
             telefono: user.telefono,
             direccion: user.direccion,
-            cp: user.cp,
+            codigoPostal: user.codigoPostal,
             localidad: user.localidad,
             provincia: user.provincia,
             pais: user.pais,
@@ -240,10 +240,11 @@ const updateUserService = async (id,data,{requesterRole, requesterId}) => {
                 message: "No tiene permisos para modificar usuarios root"
             }
        }
+       console.log(role, data.role, currentUserId, id)
        if (role === "ADMIN" && data.role === "ADMIN" && currentUserId !== id) {
             throw {
                     statusCode: 403,
-                    message: "No tiene permisos para modificar otros usuarios admin",
+                    message: "No tiene permisos para crear o modificar usuarios admin",
                 }
        }
 
@@ -267,7 +268,7 @@ const updateUserService = async (id,data,{requesterRole, requesterId}) => {
         "genero",
         "telefono",
         "direccion",
-        "cp",
+        "codigoPostal",
         "localidad",
         "provincia",
         "pais",
@@ -300,7 +301,7 @@ const updateUserService = async (id,data,{requesterRole, requesterId}) => {
             genero: user.genero,
             telefono: user.telefono,
             direccion: user.direccion,
-            cp: user.cp,
+            codigoPostal: user.codigoPostal,
             localidad: user.localidad,
             provincia: user.provincia,
             pais: user.pais,

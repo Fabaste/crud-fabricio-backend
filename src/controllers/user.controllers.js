@@ -109,7 +109,7 @@ const updateUser = async (req,res) => {
             req.params.id,
             req.body,
             {requesterRole: req.user?.role,
-             requesterId: req.user?.id
+             requesterId: req.user?.userId
         })
 
         //res.json(user)

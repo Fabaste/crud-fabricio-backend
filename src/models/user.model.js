@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     
-    cp:{
+    codigoPostal:{
         type: String,
         required: true
     },
