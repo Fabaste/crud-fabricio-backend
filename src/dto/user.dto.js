@@ -69,8 +69,32 @@ const userParamsSchema = Joi.object({
     }),
 })
 
+const registerUserSchema = Joi.object({
+    nombre: Joi.string().trim().min(2).max(50).required(),
+    apellido: Joi.string().trim().min(2).max(50).required(),
+    email: Joi.string().trim().email().required(),
+    password: Joi.string().min(6).max(50).required(),
+    fechaNacimiento: Joi.date().required(),
+    edad: Joi.number().integer().min(1).max(120).required().messages({
+        "number.base": "La edad debe ser numérica",
+        "number.integer": "La edad debe ser un número entero",
+        "number.min": "La edad debe ser mayor a 0",
+        "number.max": "La edad no puede ser mayor a 120",
+    }),
+    genero: Joi.string().trim().required(),
+    telefono: Joi.string().trim().min(6).max(20).required(),
+    direccion: Joi.string().trim().max(200).required(),
+    codigoPostal: Joi.string().trim().max(20).required(),
+    localidad: Joi.string().trim().max(100).required(),
+    provincia: Joi.string().trim().max(100).required(),
+    pais: Joi.string().trim().max(100).required(),
+    role: Joi.string().valid(...roles).default("USER")
+    /* userName: Joi.string().trim().min(2).max(100).required(),  */
+})
+
 export {
     createUserSchema,
     updateUserSchema,
+    registerUserSchema,
     userParamsSchema
 }

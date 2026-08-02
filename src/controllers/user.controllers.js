@@ -1,6 +1,7 @@
 import {
     createUserSchema,
     updateUserSchema,
+    registerUserSchema,
     userParamsSchema
 } from '../dto/user.dto.js'
 
@@ -8,6 +9,7 @@ import {
     getUsersService,
     createUserService,
     updateUserService,
+    registerUserService,
     deleteUserService
 } from '../services/user.service.js'
 
@@ -154,9 +156,41 @@ const deleteUser = async (req,res) => {
     }
 }
 
+const registerUser = async (req,res) => {
+    try {
+        //console.log('CONTROLLER -> createUser')
+
+        // VALIDAR DTO
+        console.log(req.body)
+        const {error} = registerUserSchema.validate(req.body)
+
+        if (error){
+            /*return res.status(400).json({
+                error: error.details[0].message
+            })   */     
+           return successResponse(res, "Error de validación", 400, error.details)
+        }
+
+        //const user = await createUserService(req.body)
+        
+        //const role = req.body.role
+
+        const user = await registerUserService(req.body)
+
+        //res.status(201).json(user)
+        return successResponse(res, user, "Usuario creado correctamente", 201)
+    } catch (error) {
+        /*res.status(500).json({
+            error: error.message
+        })*/
+       return errorResponse(res, error.message || "Error interno del servidor", error.statusCode || 500, error.errors || null)
+    }    
+}
+
 export {
     getUsers,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    registerUser
 }

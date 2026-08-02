@@ -390,9 +390,93 @@ const deleteUserService = async (id) => {
     }
 }
 
+const registerUserService = async (data) => {
+    console.log('SERVICE -> registerUserService')
+    console.log(data)
+
+    try {
+        /*const role = requesterRole?.toUpperCase()*/
+
+        const existUser = await User.findOne({
+            email: data.email,  
+        })
+
+        if (existUser){
+            throw {
+                statuscode: 409,
+                message: 'El usuario ya existe',
+            }
+        }
+
+
+        /*if (role === "ADMIN" && (data.role === "ROOT" || data.role === "ADMIN")) {
+            throw {
+                    statusCode: 403,
+                    message: `No tiene permisos para agregar usuarios ${data.role}`,
+                }
+        }*/
+
+        const hashedPassword = await bcrypt.hash(
+            data.password, 
+            10,
+        )
+
+        const user = new User({
+            nombre: data.nombre,
+            apellido: data.apellido,
+            email: data.email,
+            password: hashedPassword,
+            fechaNacimiento: data.fechaNacimiento,
+            edad: data.edad,
+            genero: data.genero,
+            telefono: data.telefono,
+            direccion: data.direccion,
+            codigoPostal: data.codigoPostal,
+            localidad: data.localidad,
+            provincia: data.provincia,
+            pais: data.pais,
+            role: data.role
+
+        })
+
+        await user.save()
+
+        return {
+            id: user._id,
+            nombre: user.nombre,
+            apellido: user.apellido,
+            email: user.email,
+            fechaNacimiento: user.fechaNacimiento,
+            edad: user.edad,
+            genero: user.genero,
+            telefono: user.telefono,
+            direccion: user.direccion,
+            codigoPostal: user.codigoPostal,
+            localidad: user.localidad,
+            provincia: user.provincia,
+            pais: user.pais,
+            role: user.role
+        }
+
+    } catch (error) {
+        //throw error
+        console.error (
+            "Error en registerUserService:",
+            error
+        )
+
+        throw {
+            statusCode: error.statusCode || 500,
+            message: error.message || "Error interno del servidor",
+            errors: error.errors || null,
+        }
+    }
+}
+
 export {
     getUsersService,
     createUserService,
     updateUserService,
-    deleteUserService
+    deleteUserService,
+    registerUserService
 }

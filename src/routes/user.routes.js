@@ -3,7 +3,8 @@ import {
     getUsers,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    registerUser
 } from '../controllers/user.controllers.js'
 
 import { authMiddleware } from '../middlewares/auth.middleware.js'
@@ -37,5 +38,7 @@ router.delete('/users/:id',
     'ROOT',
     'ADMIN',
 ),deleteUser)
+
+router.post('/register', registerUser)
 
 export default router
