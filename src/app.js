@@ -6,7 +6,7 @@ import corsConfig from "./config/cors.js"
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import { rateLimiter } from './middlewares/rateLimit.middlewares.js'
-import resendRoutes from './routes/resend.routes.js'
+import registerRoutes from './routes/register.routes.js'
 
 const app = express()
 
@@ -18,7 +18,7 @@ connectDB()
 
 app.use(userRoutes)
 app.use("/auth",authRoutes)
-app.use(resendRoutes)
+app.use(registerRoutes)
 
 app.listen(process.env.Port, () => (
     console.log(`Servidor corriendo en puerto ${process.env.Port}`)

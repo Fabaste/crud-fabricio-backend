@@ -1,22 +1,12 @@
-import { Resend } from 'resend';
-import {resend} from '../config/resend.js'
+import { Router } from 'express';
+import { iniciarRegistro, verificarCodigo } from '../controllers/register.controllers.js';
 
-console.log(resend)
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end();
+const router = Router();
 
-  const { email, codigo } = req.body;
+// Paso 1: Recibe datos del formulario, genera código, guarda temporal y envía correo
+router.post('/registro/iniciar', iniciarRegistro);
 
-  try {
-    const data = await resend.emails.send({
-      from: 'fabaste@msn.com>', // Cambia por tu dominio verificado
-      to: [email],
-      subject: 'Código de confirmación',
-      html: `<p>Tu código de verificación es: <strong>${codigo}</strong></p>`,
-    });
+// Paso 2: Recibe el código, lo valida, y pasa el usuario a la lista definitiva
+router.post('/registro/verificar', verificarCodigo);
 
-    return res.status(200).json({ success: true, data });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-}
+export default router;
