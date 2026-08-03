@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 dotenv.config()
-const requiredVariables = ["PORT", "MONGO_URI", "JWT_SECRET", "JWT_EXPIRES_IN", "FRONTEND_URLS"]
+const requiredVariables = ["PORT", "MONGO_URI", "JWT_SECRET", "JWT_EXPIRES_IN", "FRONTEND_URLS","RESEND_API_KEY"]
 
 requiredVariables.forEach((variable) => {
     if(!process.env[variable]) {
@@ -18,4 +18,5 @@ export const env = {
     JWT_SECRET: process.env.JWT_SECRET,
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
     FRONTEND_URLS: process.env.FRONTEND_URLS,
+    RESEND_API_KEY: process.env.RESEND_API_KEY
 }

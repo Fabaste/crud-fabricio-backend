@@ -39,6 +39,4 @@ router.delete('/users/:id',
     'ADMIN',
 ),deleteUser)
 
-router.post('/register', registerUser)
-
 export default router
