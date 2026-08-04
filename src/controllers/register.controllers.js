@@ -11,7 +11,6 @@ export const iniciarRegistro = async (req, res) => {
 
     // Llamamos al servicio para procesar el preregistro
     const resultado = await registerService.crearRegistroTemporal(req.body);
-
     return res.status(200).json({ 
       success: true, 
       message: 'Código enviado al correo',
@@ -23,6 +22,7 @@ export const iniciarRegistro = async (req, res) => {
 };
 
 export const verificarCodigo = async (req, res) => {
+console.log("Verificando código:", req.body);
   try {
     const { tokenTemporal, codigo } = req.body;
 

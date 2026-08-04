@@ -113,7 +113,6 @@ const getUsersService = async ({email,id, requesterRole, requesterId}) => {
 
 const createUserService = async (data, { requesterRole }) => {
     console.log('SERVICE -> createUserService')
-    console.log(data)
 
     try {
         const role = requesterRole?.toUpperCase()
