@@ -19,6 +19,10 @@ export const crearRegistroTemporal = async (datosUsuario) => {
   //const tokenTemporal = crypto.randomUUID();
   const secretKey = "tu_clave_secreta";
 
+  const hashedPassword = await bcrypt.hash(
+      data.password, 
+      10,
+  )
   const tokenTemporal = jwt.sign(
     { nonce: Date.now() }, // Usa los milisegundos actuales para hacerlo único
     secretKey, 
@@ -29,6 +33,7 @@ export const crearRegistroTemporal = async (datosUsuario) => {
 
   // 4. Guardar temporalmente los datos del usuario + código + expiración
   registrosTemporales.set(tokenTemporal, {
+    password: hashedPassword,
     ...datosUsuario,
     codigo,
     expiraEn
