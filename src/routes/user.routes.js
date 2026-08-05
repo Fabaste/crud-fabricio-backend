@@ -39,4 +39,5 @@ router.delete('/users/:id',
     'ADMIN',
 ),deleteUser)
 
+
 export default router

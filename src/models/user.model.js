@@ -77,6 +77,22 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null,
     },
+
+    // ==========================================
+    // NUEVOS CAMPOS ADICIONALES PARA EL 2FA:
+    // Al poner default, no rompe a tus usuarios viejos.
+    // ==========================================
+    twoFactorEnabled: {
+        type: Boolean,
+        default: false, // Por defecto nadie lo tiene activo hasta que valide el QR
+    },
+
+    twoFactorSecret: {
+        type: String,
+        default: null, // Se llena dinámicamente en el loginService
+    },
+    // ==========================================
+    
 }, {
     timestamps:true
 })
