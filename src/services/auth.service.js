@@ -115,6 +115,7 @@ const verificar2FAService = async (tokenTemporal, codigo) => {
         return {
             token,
             role: user.role,
+            userId: user._id,
         };
     } catch (error) {
         console.error("✖️ Error en verificar2FAService", error);
