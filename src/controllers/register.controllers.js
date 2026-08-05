@@ -32,7 +32,7 @@ console.log("Verificando código:", req.body);
 
     // El servicio valida el código y el tiempo de expiración
     const usuarioConfirmado = await registerService.confirmarRegistroDefinitivo(tokenTemporal, codigo);
-
+console.log(usuarioConfirmado)
     return res.status(201).json({ 
       success: true, 
       message: 'Usuario registrado con éxito', 

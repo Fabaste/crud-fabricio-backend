@@ -19,22 +19,23 @@ export const crearRegistroTemporal = async (datosUsuario) => {
   //const tokenTemporal = crypto.randomUUID();
   const secretKey = "tu_clave_secreta";
 
-  const hashedPassword = await bcrypt.hash(
-      data.password, 
-      10,
-  )
+  const {password, ...rest} = datosUsuario
+  const hashedPassword = await bcrypt.hash(password, 10,)
+
   const tokenTemporal = jwt.sign(
     { nonce: Date.now() }, // Usa los milisegundos actuales para hacerlo único
     secretKey, 
-    { expiresIn: '5m' }    // Expira en 5 minutos
+    { expiresIn: '2m' }    // Expira en 2 minutos
   )
-  // 3. Definir tiempo de expiración (Ej: 5 minutos desde ahora)
-  const expiraEn = Date.now() + 5 * 60 * 1000;
+  // 3. Definir tiempo de expiración (Ej: 2 minutos desde ahora)
+  const expiraEn = Date.now() + 2 * 60 * 1000;
 
   // 4. Guardar temporalmente los datos del usuario + código + expiración
-  registrosTemporales.set(tokenTemporal, {
+  registrosTemporales.set(
+    tokenTemporal, 
+    {
     password: hashedPassword,
-    ...datosUsuario,
+    ...rest,
     codigo,
     expiraEn
   });
@@ -45,7 +46,7 @@ export const crearRegistroTemporal = async (datosUsuario) => {
       console.log(`Registro temporal ${tokenTemporal} eliminado por expiración de tiempo.`);
       registrosTemporales.delete(tokenTemporal);
     }
-  }, 5 * 60 * 1000);
+  }, 2 * 60 * 1000);
 
   // 6. Enviar el correo usando Resend
   await resend.emails.send({
@@ -63,7 +64,6 @@ export const crearRegistroTemporal = async (datosUsuario) => {
 export const confirmarRegistroDefinitivo = async (tokenTemporal, codigoIngresado) => {
   try{
     const registro = registrosTemporales.get(tokenTemporal);
-    
     // Validación A: ¿Existe el registro o ya fue borrado por expiración?
     if (!registro) {
       const error = new Error('El código ha expirado o la sesión de registro no existe.');
@@ -71,7 +71,7 @@ export const confirmarRegistroDefinitivo = async (tokenTemporal, codigoIngresado
       throw error;
     }
 
-    // Validación B: ¿Ya pasaron los 5 minutos? (Doble verificación de seguridad)
+    // Validación B: ¿Ya pasaron los 2 minutos? (Doble verificación de seguridad)
     if (Date.now() > registro.expiraEn) {
       registrosTemporales.delete(tokenTemporal); // Forzar borrado
       const error = new Error('El código ha expirado. Vuelve a registrarte.');
@@ -96,8 +96,6 @@ export const confirmarRegistroDefinitivo = async (tokenTemporal, codigoIngresado
       activo: true
     };*/
     const nuevoUsuarioDefinitivo = new User(datosUsuario);
-
-
 
     // Guardar en tu DB real aquí (Ej: await Usuario.create(nuevoUsuarioDefinitivo))
     
