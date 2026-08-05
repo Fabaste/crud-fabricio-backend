@@ -17,7 +17,8 @@ export const crearRegistroTemporal = async (datosUsuario) => {
   
   // 2. Generar un token único para identificar esta transacción en el Front
   //const tokenTemporal = crypto.randomUUID();
-  const secretKey = "tu_clave_secreta";
+  //const secretKey = "tu_clave_secreta";
+  const secretKey = env.JWT_SECRET;
 
   const {password, ...rest} = datosUsuario
   const hashedPassword = await bcrypt.hash(password, 10,)

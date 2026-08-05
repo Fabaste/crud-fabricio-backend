@@ -41,7 +41,7 @@ const loginService = async (data) => {
 
             // Generamos un token temporal muy corto (vence en 5 min) solo para el segundo paso
             const tokenTemporal = jwt.sign(
-                { userId: user._id, pendiente2FA: true },
+                { userId: user._id, userEmail: user.email, pendiente2FA: true },
                 env.JWT_SECRET,
                 { expiresIn: "5m" }
             );
@@ -130,7 +130,9 @@ export { loginService, verificar2FAService };
 
 
 
-
+//##############################################
+//CODIGO ANTES DE VERIFICACION DE DOBLE FACTOR
+//##############################################
 
 /*import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"
