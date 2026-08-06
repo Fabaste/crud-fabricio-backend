@@ -5,7 +5,6 @@ import mongoose, { mongo } from "mongoose"
 import { request } from "express"
 
 const getUsersService = async ({email,id, requesterRole, requesterId}) => {
-    console.log('SERVICE -> getUsersService')
     try {
         const role = requesterRole?.toUpperCase()
         const currentUserId = requesterId?.toString()
