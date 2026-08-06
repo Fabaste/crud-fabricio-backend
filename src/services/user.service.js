@@ -321,9 +321,7 @@ const updateUserService = async (id,data,{requesterRole, requesterId}) => {
 }
 
 const deleteUserService = async (id) => {
-        console.log('SERVICE -> deleteUserService')
-        console.log(id)
-
+    
     let session
 
     try {
