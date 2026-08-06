@@ -71,6 +71,9 @@ const createUser = async (req,res) => {
 
         const user = await createUserService(req.body,{
             requesterRole: req.user?.role,
+            requesterName: req.name?.name,
+            requesterApellido: req.apellido?.apellido,
+            requesterId: req.user?.userId,
         })
 
         //res.status(201).json(user)

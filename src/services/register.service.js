@@ -101,6 +101,16 @@ export const confirmarRegistroDefinitivo = async (tokenTemporal, codigoIngresado
     // Guardar en tu DB real aquí (Ej: await Usuario.create(nuevoUsuarioDefinitivo))
     
     await nuevoUsuarioDefinitivo.save()
+    
+  // 6. Enviar el correo usando Resend
+  await resend.emails.send({
+    from: 'TuApp <onboarding@resend.dev>', // Usa tu dominio verificado en producción
+    //to: [datosUsuario.email],
+    to: "frssartor@gmail.com",
+    subject: 'Bienvenido/a',
+    html: `<p><strong>¡¡¡BIENVENIDO/A!!! ${nuevoUsuarioDefinitivo.nombre} ${nuevoUsuarioDefinitivo.apellido}</strong><br>Tu registración se confirmo con éxito</p>
+           <p>Ahora ponte a trabajar.</p>`,
+  });
 
     // Limpiamos la tabla temporal inmediatamente para liberar memoria/espacio
     registrosTemporales.delete(tokenTemporal);

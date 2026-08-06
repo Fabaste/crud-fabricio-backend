@@ -1,12 +1,26 @@
 import mongoose from "mongoose"
 
 const auditSchema = new mongoose.Schema({
-    usuarioEliminado: {
+    action: {
+        type: String,
+        enum: ['CREATE', 'UPDATE', 'DELETE'],
+        required: true
+    },
+    author: {
+        type: Object,
+        required: false,
+        default: null
+    },
+    affectedUser: {
         type: Object,
         required: true
     },
-
-    fechaEliminacion: {
+    changes: {
+        type: Object,
+        required: false,
+        default: {}
+    },
+    createdAt: {
         type: Date,
         default: Date.now
     }

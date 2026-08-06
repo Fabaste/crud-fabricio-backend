@@ -1,8 +1,12 @@
+import { Resend } from 'resend';
 import bcrypt from "bcryptjs"
 import User from '../models/user.model.js'
 import Audit from '../models/audit.model.js'
-import mongoose, { mongo } from "mongoose"
-import { request } from "express"
+import mongoose from "mongoose"
+import { env } from '../config/env.js';
+import { logger } from '../logs/logger.js';
+
+const resend = new Resend(env.RESEND_API_KEY);
 
 const getUsersService = async ({email,id, requesterRole, requesterId}) => {
     try {
@@ -110,8 +114,12 @@ const getUsersService = async ({email,id, requesterRole, requesterId}) => {
     }
 }
 
-const createUserService = async (data, { requesterRole }) => {
-    console.log('SERVICE -> createUserService')
+const createUserService = async (data, { requesterRole, requesterName, requesterApellido, requesterId }) => {
+    
+    const currentUserName = requesterName?.toString()
+    const currentUserApellido= requesterApellido?.toString()
+    const currentUserId = requesterId?.toString()
+    let session
 
     try {
         const role = requesterRole?.toUpperCase()
@@ -158,7 +166,45 @@ const createUserService = async (data, { requesterRole }) => {
 
         })
 
-        await user.save()
+        session = await mongoose.startSession()
+
+        await session.withTransaction(async () => {
+            await user.save({ session })
+
+            await Audit.create([
+                {
+                    action: 'CREATE',
+                    author: {
+                        id: currentUserId || null,
+                        nombre: currentUserName || null,
+                        apellido: currentUserApellido || null,
+                        role: role || null,
+                    },
+                    affectedUser: user.toObject(),
+                    changes: {
+                        created: true,
+                        fields: ['nombre', 'apellido', 'email', 'role']
+                    }
+                }
+            ], { session })
+        })
+        
+        // 6. Enviar el correo usando Resend
+        await resend.emails.send({
+            from: 'TuApp <onboarding@resend.dev>', // Usa tu dominio verificado en producción
+            //to: [datosUsuario.email],
+            to: "frssartor@gmail.com",
+            subject: 'Bienvenido/a',
+            html: `<p><strong>¡¡¡BIENVENIDO/A!!! ${user.nombre} ${user.apellido}</strong><br>Tu registración se confirmo con éxito</p>
+                <p>El usuario ${currentUserName} ${currentUserApellido} te ha dado de alta en el sistema.</p>
+                <p>Ahora ponte a trabajar.</p>`,
+        });
+
+        logger.info('Usuario creado', {
+            authorId: currentUserId || null,
+            affectedUserId: user._id.toString(),
+            action: 'CREATE'
+        })
 
         return {
             id: user._id,
@@ -178,24 +224,27 @@ const createUserService = async (data, { requesterRole }) => {
         }
 
     } catch (error) {
-        //throw error
-        console.error (
-            "Error en createUserService:",
-            error
-        )
+        logger.error('Error al crear usuario', {
+            error: error.message,
+            stack: error.stack,
+            authorId: currentUserId || null
+        })
 
         throw {
             statusCode: error.statusCode || 500,
             message: error.message || "Error interno del servidor",
             errors: error.errors || null,
         }
+    } finally {
+        if (session) {
+            await session.endSession()
+        }
     }
 }
 
 const updateUserService = async (id,data,{requesterRole, requesterId}) => {
-        console.log('SERVICE -> updateUserService')
-        console.log(id)
-        console.log(data)
+
+    let session
 
     try {
         
@@ -238,7 +287,7 @@ const updateUserService = async (id,data,{requesterRole, requesterId}) => {
                 message: "No tiene permisos para modificar usuarios root"
             }
        }
-       console.log(role, data.role, currentUserId, id)
+
        if (role === "ADMIN" && data.role === "ADMIN" && currentUserId !== id) {
             throw {
                     statusCode: 403,
@@ -273,23 +322,58 @@ const updateUserService = async (id,data,{requesterRole, requesterId}) => {
         "role",
       ]
 
+      const changes = {}
+
       allowedFields.forEach((field) => {
         if (data[field] !== undefined){
-            user[field] = data[field]
+            if (user[field] !== data[field]) {
+                changes[field] = {
+                    before: user[field],
+                    after: data[field]
+                }
+                user[field] = data[field]
+            }
         }
       })
         // Cambiar password si viene
         if (data.password !== undefined) {
+            changes.password = {
+                before: '[protected]',
+                after: '[protected]'
+            }
             user.password = await bcrypt.hash(
                 data.password,
                 10
             )
         }
 
-        //console.log("llegue")
-        await user.save()
+        session = await mongoose.startSession()
+
+        await session.withTransaction(async () => {
+            await user.save({ session })
+
+            if (Object.keys(changes).length > 0) {
+                await Audit.create([
+                    {
+                        action: 'UPDATE',
+                        author: {
+                            id: currentUserId || null,
+                            role: role || null,
+                        },
+                        affectedUser: user.toObject(),
+                        changes,
+                    }
+                ], { session })
+            }
+        })
+
+        logger.info('Usuario actualizado', {
+            authorId: currentUserId || null,
+            affectedUserId: user._id.toString(),
+            action: 'UPDATE',
+            changes
+        })
     
-        console.log(user)
         return {
             id: user._id,
             nombre: user.nombre,
@@ -307,21 +391,26 @@ const updateUserService = async (id,data,{requesterRole, requesterId}) => {
         }
 
     } catch (error) {
-        //throw error
-        console.error (
-            "Error en updateUserService:", error
-        )
+        logger.error('Error al actualizar usuario', {
+            error: error.message,
+            userId: id,
+            authorId: currentUserId || null
+        })
 
         throw {
             statusCode: error.statusCode || 500,
             message: error.message || "Error interno del servidor",
             errors: error.errors || null,
         }
+    } finally {
+        if (session) {
+            await session.endSession()
+        }
     }
 }
 
 const deleteUserService = async (id) => {
-    
+
     let session
 
     try {
@@ -346,12 +435,15 @@ const deleteUserService = async (id) => {
                 }
             }
 
-            //Auditoria
             await Audit.create (
                 [
                     {
-                        usuarioEliminado: user.toObject(),
-                        fechaEliminacion: new Date(),
+                        action: 'DELETE',
+                        author: null,
+                        affectedUser: user.toObject(),
+                        changes: {
+                            deleted: true
+                        },
                     },
                 ],
                 {session}
@@ -361,6 +453,11 @@ const deleteUserService = async (id) => {
             await user.deleteOne({ session })
         })
 
+        logger.warn('Usuario eliminado', {
+            affectedUserId: id,
+            action: 'DELETE'
+        })
+
         return {
             message: 'Usuario eliminado',
         }
@@ -368,10 +465,10 @@ const deleteUserService = async (id) => {
 
 
     } catch (error) {
-        //throw error
-        console.error(
-            "Error en deleteUserService:", error
-        )
+        logger.error('Error al eliminar usuario', {
+            error: error.message,
+            userId: id
+        })
         
         throw {
             statusCode: error.statusCode || 500,
