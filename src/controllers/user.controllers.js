@@ -71,8 +71,8 @@ const createUser = async (req,res) => {
 
         const user = await createUserService(req.body,{
             requesterRole: req.user?.role,
-            requesterName: req.name?.name,
-            requesterApellido: req.apellido?.apellido,
+            requesterName: req.user?.name,
+            requesterApellido: req.user?.apellido,
             requesterId: req.user?.userId,
         })
 
@@ -88,7 +88,6 @@ const createUser = async (req,res) => {
 
 const updateUser = async (req,res) => {
     try {
-        console.log('CONTROLLER -> updateUser')
         // VALIDAR DTO
         const {error: paramsError} = userParamsSchema.validate(req.params)
         //console.log(" ~ updateUser ~ error:", paramsError)

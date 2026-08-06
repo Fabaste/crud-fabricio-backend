@@ -5,8 +5,10 @@ import corsConfig from "./config/cors.js"
 //import { env } from './config/env.js'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
+import auditRoutes from './routes/audit.routes.js'
 import { rateLimiter } from './middlewares/rateLimit.middlewares.js'
 import registerRoutes from './routes/register.routes.js'
+import { startAuditCron } from './jobs/auditCron.js'
 
 const app = express()
 
@@ -18,7 +20,10 @@ connectDB()
 
 app.use(userRoutes)
 app.use("/auth",authRoutes)
+app.use(auditRoutes)
 app.use(registerRoutes)
+
+startAuditCron()
 
 app.listen(process.env.Port, () => (
     console.log(`Servidor corriendo en puerto ${process.env.Port}`)

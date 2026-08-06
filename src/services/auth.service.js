@@ -109,7 +109,12 @@ const verificar2FAService = async (tokenTemporal, codigo) => {
         }
 
         // 3. Generación del JWT Real y Definitivo de Sesión
-        const payload = { userId: user._id, role: user.role };
+        const payload = {
+            userId: user._id,
+            role: user.role,
+            name: user.nombre,
+            apellido: user.apellido,
+        };
         const token = jwt.sign(payload, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRES_IN });
 
         return {
