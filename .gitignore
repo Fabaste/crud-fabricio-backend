@@ -8,8 +8,9 @@ node_modules/
 envbd.txt
 
 # Logs
-logs/
+log/
 *.log
+test/
 
 # Archivos del sistema
 .DS_Store
