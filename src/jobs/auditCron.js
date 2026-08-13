@@ -5,7 +5,7 @@ import { logger } from '../logs/logger.js';
 let latestAuditSnapshot = [];
 
 const startAuditCron = () => {
-  cron.schedule('*/2 * * * *', async () => {
+  cron.schedule('* * * * *', async () => {
     try {
       latestAuditSnapshot = await getRecentAuditActivity(1);
       logger.info('Actividad de auditoría recopilada por cron', {

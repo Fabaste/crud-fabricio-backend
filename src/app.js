@@ -23,9 +23,10 @@ app.use("/auth",authRoutes)
 app.use(auditRoutes)
 app.use(registerRoutes)
 
-startAuditCron()
+//startAuditCron()
 
-app.listen(process.env.Port, () => (
-    console.log(`Servidor corriendo en puerto ${process.env.Port}`)
+//const PORT = process.env.PORT || 7000
+app.listen(process.env.PORT, () => (
+    console.log(`Servidor corriendo en puerto ${process.env.PORT}`)
    // console.log('Servidor corriendo en puerto' , process.env.Port)
 ))
